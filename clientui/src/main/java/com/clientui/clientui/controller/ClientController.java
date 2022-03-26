@@ -1,8 +1,10 @@
 package com.clientui.clientui.controller;
 
 
+import com.clientui.beans.CommandeBean;
 import com.clientui.clientui.com.clientui.clientui.beans.PaiementBean;
 import com.clientui.clientui.com.clientui.clientui.beans.ProductBean;
+import com.clientui.clientui.com.clientui.clientui.proxies.MicroserviceCommandeProxy;
 import com.clientui.clientui.com.clientui.clientui.proxies.MicroservicePaiementProxy;
 import com.clientui.clientui.com.clientui.clientui.proxies.MicroserviceProduitsProxy;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,12 +15,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Controller
 public class ClientController {
     private final MicroserviceProduitsProxy produitsProxy;
+    @Autowired
+    private MicroserviceCommandeProxy CommandesProxy;
     @Autowired
     private MicroservicePaiementProxy paiementProxy;
     public ClientController(MicroserviceProduitsProxy produitsProxy){
@@ -38,26 +43,26 @@ public class ClientController {
         model.addAttribute("produit", produit);
         return "FicheProduit";
     }
-//    @RequestMapping(value = "/commander-produit/{idProduit}/{montant}")
-//    public String passerCommande(@PathVariable int idProduit, @PathVariable Double montant,  Model model){
-//
-//
-//        CommandeBean commande = new CommandeBean();
-//
-//        //On renseigne les propriétés de l'objet de type CommandeBean que nous avons crée
-//        commande.setProductId(idProduit);
-//        commande.setQuantite(1);
-//        commande.setDateCommande(new Date());
-//
-//        //appel du microservice commandes grâce à Feign et on récupère en retour les détails de la commande créée, notamment son ID (étape 4).
-//        CommandeBean commandeAjoutee = CommandesProxy.ajouterCommande(commande);
-//
-//        //on passe à la vue l'objet commande et le montant de celle-ci afin d'avoir les informations nécessaire pour le paiement
-//        model.addAttribute("commande", commandeAjoutee);
-//        model.addAttribute("montant", montant);
-//
-//        return "Paiement";
-//    }
+    @RequestMapping(value = "/commander-produit/{idProduit}/{montant}")
+    public String passerCommande(@PathVariable int idProduit, @PathVariable Double montant,  Model model){
+
+
+        CommandeBean commande = new CommandeBean();
+
+        //On renseigne les propriétés de l'objet de type CommandeBean que nous avons crée
+        commande.setProductId(idProduit);
+        commande.setQuantite(1);
+        commande.setDateCommande(new Date());
+
+        //appel du microservice commandes grâce à Feign et on récupère en retour les détails de la commande créée, notamment son ID (étape 4).
+        CommandeBean commandeAjoutee = CommandesProxy.ajouterCommande(commande);
+
+        //on passe à la vue l'objet commande et le montant de celle-ci afin d'avoir les informations nécessaire pour le paiement
+        model.addAttribute("commande", commandeAjoutee);
+        model.addAttribute("montant", montant);
+
+        return "Paiement";
+    }
 
     /*
      * Étape (5)
